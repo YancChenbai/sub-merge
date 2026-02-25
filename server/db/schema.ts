@@ -36,6 +36,21 @@ export const group = pgTable('group', {
   index('group_idx').on(table.id),
 ])
 
+export const remoteRule = pgTable('remote_rule', {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: varchar().unique().notNull(),
+  url: varchar().notNull(),
+  proxy: varchar().default('DIRECT').notNull(),
+  enabled: boolean().notNull().default(true),
+  content: text(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+}, table => [
+  index('remote_rule_idx').on(table.id),
+  index('remote_rule_name_idx').on(table.name),
+])
+
 export type Sub = InferSelectModel<typeof sub>
 export type Rule = InferSelectModel<typeof rule>
 export type Group = InferSelectModel<typeof group>
+export type RemoteRule = InferSelectModel<typeof remoteRule>

@@ -1,24 +1,20 @@
 <script lang="tsx" setup>
 import type { Table } from '#components'
-import type { Sub } from '#server/db'
+import type { RemoteRule } from '#server/db'
 import type { TableColumn } from '@nuxt/ui'
-import { UButton } from '#components'
-import { useClipboard } from '@vueuse/core'
-import CreateSubModal from './CreateSubModal.vue'
+import { UButton, USwitch } from '#components'
+import CreateRemoteRuleModal from './CreateRemoteRuleModal.vue'
 
 const dialog = useDialog()
-const subModal = useUpdateSubModal()
-const { data, isLoading, refreshSub, remove, toggleMainSub, refetch } = useSubQuery()
-const source = ref('')
-const toast = useToast()
-const { copy } = useClipboard({ source })
+const remoteRuleModal = useUpdateRemoteRuleModal()
+const { data, isLoading, refreshRemoteRule, remove, setEnabled, refetch } = useRemoteRuleQuery()
 
-const columns: TableColumn<Sub>[] = [
+const columns: TableColumn<RemoteRule>[] = [
   {
     accessorKey: 'id',
     header: 'ID',
     meta: {
-      class: { th: 'w-[100px]' },
+      class: { th: 'w-[80px]' },
     },
   },
   {
@@ -33,17 +29,39 @@ const columns: TableColumn<Sub>[] = [
     header: 'URL',
     cell({ row }) {
       return (
-        <div class="w-75 text-ellipsis overflow-hidden" title={row.original.url}>
+        <div class="w-30 text-ellipsis overflow-hidden" title={row.original.url}>
           {row.original.url}
         </div>
       )
     },
   },
   {
+    accessorKey: 'content',
+    header: '规则',
+    meta: {
+      class: {
+        th: 'text-center',
+        td: 'text-center',
+      },
+    },
+    cell(props) {
+      return (
+        <pre class="line-clamp-2 w-80" title={props.row.original.content ?? ''}>{props.row.original.content}</pre>
+      )
+    },
+  },
+  {
+    accessorKey: 'proxy',
+    header: '代理',
+    meta: {
+      class: { th: 'w-[150px]' },
+    },
+  },
+  {
     accessorKey: 'updatedAt',
     header: 'UpdatedAt',
     meta: {
-      class: { th: 'w-[200px]' },
+      class: { th: 'w-[100px]' },
     },
     cell(props) {
       return formatDay(props.row.original.updatedAt)
@@ -52,33 +70,27 @@ const columns: TableColumn<Sub>[] = [
   {
     id: 'actions',
     meta: {
-      class: { th: 'w-[200px]' },
+      class: { th: 'w-[280px]' },
     },
 
     cell({ row }) {
-      async function handleSetPrimary() {
-        await dialog.open({
-          confirmLabel: '确定',
-          cancelLabel: '取消',
-          title: '确定要设置该订阅为主订阅吗？',
-        })
-
-        await toggleMainSub(row.original.id)
+      async function handleEnabledUpdate(value: boolean) {
+        await setEnabled({ id: row.original.id, value })
       }
 
       async function handleUpdate() {
-        await subModal.open({
+        await remoteRuleModal.open({
           data: row.original,
         })
       }
 
       async function handleRefresh() {
-        await refreshSub(row.original.id)
+        await refreshRemoteRule(row.original.id)
       }
 
       async function handleRemove() {
         await dialog.open({
-          title: '确定要删除该订阅吗？',
+          title: '确定要删除该远程规则吗？',
           confirmLabel: '删除',
         })
 
@@ -86,17 +98,12 @@ const columns: TableColumn<Sub>[] = [
       }
 
       return (
-        <div class="flex gap-2 justify-end">
-          <UButton
-            size="sm"
-            color={row.original.main ? 'error' : 'neutral'}
-            variant="ghost"
-            loadingAuto
-            onClick={handleSetPrimary}
+        <div class="flex gap-2 justify-end items-center">
+          <USwitch
+            defaultValue={row.original.enabled}
+            onUpdate:modelValue={handleEnabledUpdate}
           >
-            {row.original.main ? '取消' : '设置'}
-            主订阅
-          </UButton>
+          </USwitch>
 
           <UButton
             size="sm"
@@ -135,17 +142,6 @@ const columns: TableColumn<Sub>[] = [
     },
   },
 ]
-
-function handleCopy() {
-  copy()
-  toast.add({
-    title: '复制成功😎',
-    description: '你需要拼接 Token 后才能使用捏~',
-    color: 'success',
-  })
-}
-
-onMounted(() => source.value = `${window.origin}/sub/`)
 </script>
 
 <template>
@@ -153,21 +149,13 @@ onMounted(() => source.value = `${window.origin}/sub/`)
     <template #header>
       <div class="flex justify-end gap-2">
         <UButton
-          size="sm"
-          color="neutral"
-          icon="mingcute:refresh-2-fill"
-          variant="ghost"
-          loading-auto
+          size="sm" color="neutral" icon="mingcute:refresh-2-fill" variant="ghost" loading-auto
           @click="async () => { await refetch() }"
         >
           刷新
         </UButton>
 
-        <UButton color="neutral" variant="ghost" @click="handleCopy">
-          复制订阅地址
-        </UButton>
-
-        <CreateSubModal />
+        <CreateRemoteRuleModal />
       </div>
     </template>
     <template #footer>
@@ -178,6 +166,4 @@ onMounted(() => source.value = `${window.origin}/sub/`)
   </Table>
 </template>
 
-<style>
-
-</style>
+<style></style>

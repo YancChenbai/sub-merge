@@ -1,0 +1,1 @@
+ALTER TABLE "remote_rule" DROP COLUMN "last_sync_at";

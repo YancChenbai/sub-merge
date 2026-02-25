@@ -1,15 +1,28 @@
 import type { Proxy, SubContent } from '#server/types'
 import { DIRECT, EMPTY_SUB } from '#server/constants'
-import { db, group, rule, sub } from '#server/db'
+import { db, group, remoteRule, rule, sub } from '#server/db'
 import { Platform } from '#server/types'
 import { querySchema } from '#shared/schema'
 import { desc, eq } from 'drizzle-orm'
 import YAML from 'yaml'
 
-// 获取所有规则
-async function getCustomRules() {
+// 获取本地规则
+async function getLocalRules() {
   const rows = await db.select({ value: rule.value }).from(rule).where(eq(rule.enabled, true))
   return rows.map(({ value }) => value.split('\n')).flat()
+}
+
+// 获取远程规则
+async function getRemoteRules() {
+  const rows = await db.select({ content: remoteRule.content }).from(remoteRule).where(eq(remoteRule.enabled, true))
+  return rows.map(({ content }) => content ? content.split('\n') : []).flat()
+}
+
+// 获取所有规则（包括本地规则和远程规则）
+async function getCustomRules() {
+  const localRules = await getLocalRules()
+  const remoteRules = await getRemoteRules()
+  return [...localRules, ...remoteRules]
 }
 
 // 获取所有自定义分组

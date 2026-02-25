@@ -40,15 +40,8 @@ const columns: TableColumn<Rule>[] = [
       },
     },
     cell(props) {
-      return h(
-        'pre',
-        {
-          class: 'line-clamp-2',
-          title: props.row.original.value,
-        },
-        {
-          default: () => props.row.original.value,
-        },
+      return (
+        <pre class="line-clamp-2" title={props.row.original.value}>{props.row.original.value}</pre>
       )
     },
   },

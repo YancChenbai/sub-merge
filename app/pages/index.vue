@@ -21,6 +21,12 @@ const items = [
     value: 'rule',
   },
   {
+    label: '远程规则',
+    icon: 'mdi:cloud-download',
+    slot: 'remote-rule',
+    value: 'remote-rule',
+  },
+  {
     label: '分组列表',
     icon: 'material-symbols-light:stack-group-outline',
     slot: 'group',
@@ -48,6 +54,9 @@ const { data: isLogin } = useQuery({
         </template>
         <template #rule>
           <RuleTable />
+        </template>
+        <template #remote-rule>
+          <RemoteRuleTable />
         </template>
         <template #group>
           <GroupTable />
