@@ -9,7 +9,7 @@ import YAML from 'yaml'
 // 获取所有规则
 async function getCustomRules() {
   const rows = await db.select({ value: rule.value }).from(rule).where(eq(rule.enabled, true))
-  return rows.map(({ value }) => value)
+  return rows.map(({ value }) => value.split('\n')).flat()
 }
 
 // 获取所有自定义分组
@@ -115,7 +115,7 @@ export default defineEventHandler(async (event) => {
   // 所有节点名称
   const proxyNameList = [...new Set(proxies.map(item => item.name))].filter(item => filter ? !item.includes(filter) : true)
 
-  if (!primarySub.content)
+  if (!primarySub?.content)
     return EMPTY_SUB
 
   // 加载自定义规则

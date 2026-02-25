@@ -12,12 +12,11 @@ export default defineEventHandler(async (event) => {
 
   const { target } = await getValidatedQuery(event, data => TValue.Parse(querySchema, data))
 
-  const rows = await db.select({ content: sub.content })
-    .from(sub)
-    .where(eq(sub.name, name))
-    .limit(1)
+  const row = await db.query.sub.findFirst({
+    where: eq(sub.name, name),
+  })
 
-  if (rows.length <= 0)
+  if (!row)
     return setResponseStatus(event, 404)
 
   setHeaders(event, {
@@ -25,7 +24,7 @@ export default defineEventHandler(async (event) => {
     'X-Content-Type-Options': 'nosniff',
   })
 
-  const [{ content }] = rows
+  const { content } = row
 
   if (!content)
     return setResponseStatus(event, 404)

@@ -39,6 +39,18 @@ const columns: TableColumn<Rule>[] = [
         td: 'text-center',
       },
     },
+    cell(props) {
+      return h(
+        'pre',
+        {
+          class: 'line-clamp-2',
+          title: props.row.original.value,
+        },
+        {
+          default: () => props.row.original.value,
+        },
+      )
+    },
   },
   {
     accessorKey: 'remark',
@@ -123,13 +135,8 @@ const columns: TableColumn<Rule>[] = [
       <div class="grid gap-2 grid-cols-[1fr_auto_auto]">
         <UInput v-model:model-value="input" placeholder="搜索规则" />
         <UButton
-          size="sm"
-          color="neutral"
-          icon="mingcute:refresh-2-fill"
-          variant="ghost"
-          loading-auto
-          class="justify-center"
-          @click="async () => { await refetch() }"
+          size="sm" color="neutral" icon="mingcute:refresh-2-fill" variant="ghost" loading-auto
+          class="justify-center" @click="async () => { await refetch() }"
         >
           刷新
         </UButton>
@@ -145,6 +152,4 @@ const columns: TableColumn<Rule>[] = [
   </Table>
 </template>
 
-<style>
-
-</style>
+<style></style>

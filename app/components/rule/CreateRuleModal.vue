@@ -31,14 +31,14 @@ function handleSubmit(data: CreateRuleSchema) {
     <template #body>
       <UForm :state="state" :validate="validate" class="gap-3 grid" @submit="(event) => handleSubmit(event.data)">
         <UFormField label="规则" name="value">
-          <UInput v-model="state.value" class="w-full" />
+          <UTextarea v-model="state.value" class="w-full" />
         </UFormField>
 
         <UFormField label="备注" name="value">
           <UInput v-model="state.remark" class="w-full" />
         </UFormField>
 
-        <UButton type="submit" class="w-full !justify-center" :loading="isCreating">
+        <UButton type="submit" class="w-full justify-center!" :loading="isCreating">
           提交
         </UButton>
       </UForm>
@@ -46,6 +46,4 @@ function handleSubmit(data: CreateRuleSchema) {
   </UModal>
 </template>
 
-<style>
-
-</style>
+<style></style>
