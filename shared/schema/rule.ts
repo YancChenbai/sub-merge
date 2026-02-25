@@ -2,7 +2,6 @@ import type { Static } from '@sinclair/typebox'
 
 export const createRuleSchema = T.Object({
   value: T.String({
-    maxLength: 255,
     minLength: 1,
   }),
   remark: T.Optional(T.Union([T.String(), T.Null()])),
